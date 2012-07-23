@@ -3,7 +3,6 @@ vmcfg - SmartOS zone definition file (JSON) creator
 
 vmcfg is a tool that allows you to create the zone definition file
 easily. It (poorly) gets its insipiration from zonecfg(1M).
-It provides
 
 ## Installation and usage
 
