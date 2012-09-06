@@ -8,6 +8,7 @@
 
 var fs = require('fs');
 var readline = require('readline');
+var imgdb =require('/usr/img/node_modules/db');
 
 /*
  * Brand Options is not exported by Joyent's VM module
@@ -253,8 +254,8 @@ function createJson(filename, callback) {
 function zonedefFileLoad(filename, callback) {
   fs.stat(filename, function (err, stats) {
     if (err) {
-      // File doesn't exists
-      callback(null, filename + ' does not exists.\nUse \'set brand\' to begin.');
+      // File doesn't exist
+      callback(null, filename + ' does not exist.\nUse \'set brand\' to begin.');
     } else {
       if (stats.isFile()) {
         callback(null, null, fs.readFileSync(filename));
@@ -311,7 +312,7 @@ function writeSetPropToJSON(shell, prop, zonedef, callback) {
       zonedef[field] = value;
 
     } else {
-      return callback('Error: ' + field + ' is not a valide property.');
+      return callback('Error: ' + field + ' is not a valid property.');
     }
 
   } else if (shell.type === 'add') {
@@ -320,7 +321,7 @@ function writeSetPropToJSON(shell, prop, zonedef, callback) {
 
     //nothing required, only allowed
     if (!BRAND_OPTIONS[zonedef.brand].allowed_properties.hasOwnProperty(prefix+field)) {
-      return callback('Error: ' + field + ' is not a valide property.');
+      return callback('Error: ' + field + ' is not a valid property.');
     }
 
     // add property at length - 1
@@ -359,68 +360,98 @@ function zonedefShell(filename, json, callback) {
   var rl = readline.createInterface(process.stdin, process.stdout, completer);
 
   // function for completion - must be a better way than that
-  function completer(line) {
+  function completer(line, callback) {
 
     var completions = [];
 
-    completions.push('info');
-
     if (typeof zonedef.brand === 'undefined') {
 
+      completions.push('info');
       completions.push('verify');
       completions.push('quit');
       completions.push('commit');
-      completions.push('set brand=');
+      completions.push('set brand');
+
+    } else if (line.match(/^set image_uuid=/)) {
+
+      imgdb.all(function (err, images_avail) {
+        for(var i in images_avail) {
+          completions.push(images_avail[i].uuid);
+        }
+
+        line = line.substr(15);
+        var hits = completions.filter(function (c) {
+          return !c.indexOf(line);
+        });
+
+        return callback(null, [ hits.length ? hits : completions, line ]);
+      });
 
     } else if (shell.context === 'main') {
 
+      completions.push('info');
       completions.push('verify');
       completions.push('quit');
       completions.push('commit');
-      completions.push('add net');
+      completions.push('add ');
+      completions.push('set ');
 
-      if (zonedef.brand === 'kvm') {
-         completions.push('add disk');
-      } else {
-          completions.push('add fs');
-      }
-
-      for (var prop in BRAND_OPTIONS[zonedef.brand].required_properties) {
-        completions.push('set ' + prop + '=');
-      }
-
-      for (var prop in BRAND_OPTIONS[zonedef.brand].allowed_properties) {
-        if (!prop.match(/(nics|disks|filesystems)/g)) {
-          /*
-           * required for image_uuid that is both required and allowed
-           * change to: !completions.hasOwnProperty(prop); in the future
-           * if more property become mandatory
-           */
-          if (prop != 'image_uuid')
-            completions.push('set ' + prop + '=');
+      if (line.match(/^set /)) {
+        completions = [];
+        for (var prop in BRAND_OPTIONS[zonedef.brand].required_properties) {
+          completions.push(prop);
         }
+
+        for (var prop in BRAND_OPTIONS[zonedef.brand].allowed_properties){
+          if (!prop.match(/(nics|disks|filesystems)/g)) {
+
+             if (prop != 'image_uuid')
+               completions.push(prop);
+          }
+        }
+
+        line = line.substr(4); //substr 'set '
+      }
+
+      if (line.match(/^add /)) {
+        completions = [];
+
+        completions.push('net');
+        if (zonedef.brand === 'kvm') {
+          completions.push('disk');
+        } else {
+          completions.push('fs');
+        }
+
+        line = line.substr(4); //substr 'add '
+
       }
 
     } else if (shell.type === 'add') {
 
       completions.push('cancel');
+      completions.push('info');
       completions.push('end');
+      completions.push('set ');
 
-      for (var prop in BRAND_OPTIONS[zonedef.brand].allowed_properties) {
-        var reg = new RegExp(shell.context + '\.\*\.');
-        if (prop.match(reg)) {
-          completions.push('set ' + prop.substr(shell.context.length + 3) + '=');
+      if (line.match(/^set /)) {
+        completions = [];
+
+        for (var prop in BRAND_OPTIONS[zonedef.brand].allowed_properties) {
+          var reg = new RegExp(shell.context + '\.\*\.');
+          if (prop.match(reg)) {
+            completions.push(prop.substr(shell.context.length + 3));
+          }
         }
+        line = line.substr(4); //substr 'set '
       }
-
     }
 
     var hits = completions.filter(function (c) {
       return !c.indexOf(line);
     });
 
-    return [ hits.length ? hits : completions, line ];
-
+    return callback(null, [ hits.length ? hits : completions, line ]);
   }
   //end of completer
 
@@ -479,7 +510,7 @@ function zonedefShell(filename, json, callback) {
               console.error('Error: Adding a disk is only supported on KVM VM. Use add fs instead');
            } else if (shell.context === 'filesystems' && zonedef.brand === 'kvm') {
               shell.type = shell.context = 'main';
-              console.error('Error: Filesystems features is not supported on KVM VM. Use add disk instead')
+              console.error('Error: Filesystem feature is not supported on KVM VM. Use add disk instead')
            } else {
               if (typeof zonedef[shell.context] === 'undefined') {
                 zonedef[shell.context] = [];
@@ -514,7 +545,7 @@ function zonedefShell(filename, json, callback) {
             if(err) {
               console.error('Error: ' + err);
             } else {
-              console.log('Succesfully written zone definication file ' + filename + '.')
+              console.log('Succesfully written zone definition file ' + filename + '.')
             }
             rl.prompt();
           });

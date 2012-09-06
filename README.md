@@ -10,7 +10,7 @@ Copy vmcfg to /opt
 
     # chmod +x /opt/vmcfg
     # /opt/vmcfg -f /tmp/riakzone.json
-    /tmp/riakzone.json does not exists.
+    /tmp/riakzone.json does not exist.
     Use 'set brand' to begin.
     zonedef> set brand=joyent
     zonedef> set image_uuid=399e09fc-c448-11e1-b3c8-a3d517dfbb07
@@ -32,7 +32,7 @@ Copy vmcfg to /opt
            netmask: '255.255.255.0',
            gateway: '10.88.88.2' } ] }
     zonedef> commit
-    Succesfully written zone definication file /tmp/riakzone.json.
+    Succesfully written zone definition file /tmp/riakzone.json.
     zonedef> quit
     Warning, quit does not save. Really quit ? [y/N] y
     # vmadm create < /tmp/riakzone.json
