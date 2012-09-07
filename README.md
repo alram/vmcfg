@@ -39,19 +39,27 @@ Copy vmcfg to /opt
 
 The tool also provides completion:
 
-    zonedef>[TAB]
-    info                           verify                         quit                           commit
-    add net                        add fs                         set brand=                     set image_uuid=
-    set alias=                     set autoboot=                  set billing_id=                set brand=
-    set cpu_cap=                   set cpu_shares=                set create_only=               set create_timestamp=
-    set customer_metadata=         set dataset_uuid=              set delegate_dataset=          set do_not_inventory=
-    set dns_domain=                set fs_allowed=                set hostname=                  set internal_metadata=
-    set limit_priv=                set max_locked_memory=         set max_lwps=                  set max_physical_memory=
-    set max_swap=                  set nowait=                    set owner_uuid=                set package_name=
-    set package_version=           set quota=                     set ram=                       set remove_customer_metadata=
-    set remove_internal_metadata=  set remove_tags=               set resolvers=                 set set_customer_metadata=
-    set set_internal_metadata=     set set_tags=                  set tags=                      set tmpfs=
-    set transition=                set uuid=                      set zfs_data_compression=      set zfs_data_recsize=
-    set zfs_io_priority=           set zfs_root_compression=      set zfs_root_recsize=          set zfs_storage_pool_name=
-    set zonename=                  set zpool=
+    zonedef>
+    info    verify  quit    commit  add     set
+
+    zonedef> set
+    brand                     image_uuid                alias
+    autoboot                  billing_id                brand
+    cpu_cap                   cpu_shares                create_only
+    create_timestamp          customer_metadata         dataset_uuid
+    delegate_dataset          do_not_inventory          dns_domain
+    fs_allowed                hostname                  internal_metadata
+    limit_priv                max_locked_memory         max_lwps
+    max_physical_memory       max_swap                  nowait
+    owner_uuid                package_name              package_version
+    quota                     ram                       remove_customer_metadata
+    remove_internal_metadata  remove_tags               resolvers
+    set_customer_metadata     set_internal_metadata     set_tags
+    tags                      tmpfs                     transition
+    uuid                      zfs_data_compression      zfs_data_recsize
+    zfs_io_priority           zfs_root_compression      zfs_root_recsize
+    zfs_storage_pool_name     zonename                  zpool
+
+    zonedef> set image_uuid=
+    9012a9c2-f15d-11e1-a33a-afaec53ebde9  3390ca7c-f2e7-11e1-8818-c36e0b12e58b
 
