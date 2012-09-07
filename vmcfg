@@ -364,13 +364,20 @@ function zonedefShell(filename, json, callback) {
 
     var completions = [];
 
-    if (typeof zonedef.brand === 'undefined') {
 
-      completions.push('info');
-      completions.push('verify');
-      completions.push('quit');
-      completions.push('commit');
-      completions.push('set brand');
+    if (line.match(/^set brand=/)){
+
+      for (var brand in BRAND_OPTIONS) {
+        completions.push(brand);
+      }
+
+      line = line.substr(10);
+      var hits = completions.filter(function (c) {
+        return !c.indexOf(line);
+      });
+
+      return callback(null, [ hits.length ? hits : completions, line ]);
+
 
     } else if (line.match(/^set image_uuid=/)) {
 
@@ -386,6 +393,14 @@ function zonedefShell(filename, json, callback) {
 
         return callback(null, [ hits.length ? hits : completions, line ]);
       });
+
+    } else if (typeof zonedef.brand === 'undefined') {
+
+      completions.push('info');
+      completions.push('verify');
+      completions.push('quit');
+      completions.push('commit');
+      completions.push('set brand');
 
     } else if (shell.context === 'main') {
 
@@ -405,7 +420,7 @@ function zonedefShell(filename, json, callback) {
         for (var prop in BRAND_OPTIONS[zonedef.brand].allowed_properties){
           if (!prop.match(/(nics|disks|filesystems)/g)) {
 
-             if (prop != 'image_uuid')
+             if (prop != 'image_uuid' && prop != 'brand')
                completions.push(prop);
           }
         }
@@ -445,6 +460,7 @@ function zonedefShell(filename, json, callback) {
         }
         line = line.substr(4); //substr 'set '
       }
+
     }
 
     var hits = completions.filter(function (c) {
