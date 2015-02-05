@@ -60,6 +60,3 @@ The tool also provides completion:
     zfs_io_priority           zfs_root_compression      zfs_root_recsize
     zfs_storage_pool_name     zonename                  zpool
 
-    zonedef> set image_uuid=
-    9012a9c2-f15d-11e1-a33a-afaec53ebde9  3390ca7c-f2e7-11e1-8818-c36e0b12e58b
-
